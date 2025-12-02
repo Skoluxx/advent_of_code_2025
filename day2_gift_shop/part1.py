@@ -19,8 +19,7 @@ def return_invalid(number_range):
         
             if number1 == number2:
                 invalid_ids.append(number)
-                print(number)
-                
+
     return invalid_ids
                  
                 
@@ -29,10 +28,15 @@ def return_invalid(number_range):
      
 
 def main():
-    ranges = get_ranges('test_input.md')
-    print(ranges)
+    number_ranges = get_ranges('puzzle_input.md')
 
-    return_invalid([1, 100])
+    invalid_ids = []
+    for number_range in number_ranges:
+         invalid_ids += return_invalid(number_range)
+    
+    print(invalid_ids)
+         
+         
 
 
 main()
