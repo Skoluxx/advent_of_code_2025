@@ -13,24 +13,24 @@ def crack_password(file):
 
             if line[0] == 'R':
                 while turns > 0:
-                    if current == 99:
-                        current = 0
+                    if current_number == 99:
+                        current_number = 0
                     else:
-                        current += 1
+                        current_number += 1
                     
-                    if current == 0:
+                    if current_number == 0:
                         zero_count += 1
 
                     turns -= 1
             
             elif line[0] == 'L':
                 while turns > 0:
-                    if current == 0:
-                        current = 99
+                    if current_number == 0:
+                        current_number = 99
                     else:
-                        current -= 1
+                        current_number -= 1
                     
-                    if current == 0:
+                    if current_number == 0:
                         zero_count += 1
                         
                     turns -= 1
@@ -41,6 +41,6 @@ def crack_password(file):
 
 
 def main():
-    print('Passord:', crack_password('test_input.md'))
+    print('Passord:', crack_password('puzzle_input.md'))
 
 main()
