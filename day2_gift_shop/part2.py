@@ -34,11 +34,12 @@ def invalid_ids(number_range):
 
 
 def main():
-    number_ranges = get_ranges('test_input.md')
+    number_ranges = get_ranges('puzzle_input.md')
 
     ids = []
     for number_range in number_ranges:
         ids += invalid_ids(number_range)
-    print(ids)
+    
+    print(sum_ids(ids))
 
 main()
