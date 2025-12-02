@@ -21,11 +21,13 @@ def return_invalid(number_range):
                 invalid_ids.append(number)
 
     return invalid_ids
-                 
-                
-               
-     
-     
+
+def sum_ids(id_list):
+    total = 0
+    for number in id_list:
+        total += number
+
+    return total
 
 def main():
     number_ranges = get_ranges('puzzle_input.md')
@@ -34,7 +36,9 @@ def main():
     for number_range in number_ranges:
          invalid_ids += return_invalid(number_range)
     
-    print(invalid_ids)
+    total  = sum_ids(invalid_ids)
+    print(total)
+
          
          
 
