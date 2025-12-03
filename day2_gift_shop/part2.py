@@ -32,7 +32,6 @@ def invalid_ids(number_range):
                     ids.append(number)
     return ids
 
-
 def main():
     number_ranges = get_ranges('puzzle_input.md')
 

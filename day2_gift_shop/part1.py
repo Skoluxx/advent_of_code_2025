@@ -39,8 +39,4 @@ def main():
     total  = sum_ids(invalid_ids)
     print(total)
 
-         
-         
-
-
 main()
