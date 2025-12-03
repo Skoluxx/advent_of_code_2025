@@ -3,6 +3,7 @@ def get_banks(filename):
     with open(filename, 'r') as data:
         for line in data:
             banks.append(line.strip())
+    
     return banks
 
 def sum_joltages(joltages):
@@ -13,8 +14,7 @@ def sum_joltages(joltages):
     return sum
 
 def find_largest_joltage(bank):
-    largest_joltage = []
-
+    largest_joltage = ''
     number_list = list(bank)
 
     for x in range(12):
@@ -23,13 +23,10 @@ def find_largest_joltage(bank):
             if int(number) > largest:
                 largest = int(number)
         idx = number_list.index(str(largest))
-        largest_joltage.append(int(largest))
+        largest_joltage += str(largest)
         number_list = number_list[idx+1:]
 
-    num = ''
-    for number in largest_joltage:
-        num += str(number)
-    return int(num)
+    return int(largest_joltage)
 
 def main():
     joltages = []
