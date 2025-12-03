@@ -28,18 +28,21 @@ def find_largest_joltage(bank):
     
     return int(f'{first_largest}{second_largest}')
 
+def total_joltage_output(joltages):
+    sum = 0
+    for joltage in joltages:
+        sum += joltage
+    
+    return sum
 
 
 def main():
-    banks = get_banks('test_input.md')
-    print(banks)
+    banks = get_banks('puzzle_input.md')
 
     largest_joltages = []
     for bank in banks:
         largest_joltages.append(find_largest_joltage(bank))
 
-    print(largest_joltages)
-
-
+    print(f'Total joltage output: {total_joltage_output(largest_joltages)}')
 
 main()
