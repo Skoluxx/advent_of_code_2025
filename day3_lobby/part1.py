@@ -2,7 +2,7 @@ def get_banks(filename):
     banks = []
     with open(filename, 'r') as data:
         for line in data:
-            banks.append(int(line.strip()))
+            banks.append(line.strip())
     return banks
 
 
