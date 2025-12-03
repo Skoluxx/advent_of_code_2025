@@ -12,8 +12,32 @@ def sum_joltages(joltages):
     
     return sum
 
+def find_largest_joltage(bank):
+    largest_joltage = []
+
+    number_list = list(bank)
+
+    for x in range(12):
+        largest = 0
+        for number in number_list[:len(number_list) - 11 + x]:
+            if int(number) > largest:
+                largest = int(number)
+        idx = number_list.index(str(largest))
+        largest_joltage.append(int(largest))
+        number_list = number_list[idx+1:]
+
+    num = ''
+    for number in largest_joltage:
+        num += str(number)
+    return int(num)
+
 def main():
-    banks = get_banks('test_input.md')
-    print(banks)
+    joltages = []
+
+    banks = get_banks('puzzle_input.md')
+    for bank in banks:
+        joltages.append(find_largest_joltage(bank))
+
+    print(f'Sum: {sum_joltages(joltages)}')
 
 main()
