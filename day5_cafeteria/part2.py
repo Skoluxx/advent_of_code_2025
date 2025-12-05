@@ -4,34 +4,41 @@ def get_ingredient_id_ranges(filename):
         line = data.readline()
         while '-' in line:
             values = line.strip().split('-')
-            ingredient_id_ranges.append([int(values[0]), int(values[1])])
+            ingredient_id_ranges.append((int(values[0]), int(values[1])))
             line = data.readline()
 
-    return ingredient_id_ranges
+    return sorted(ingredient_id_ranges)
 
 
-def count_fresh_ingredients(filename, ingredient_ids):
-    fresh_ingredients = []
-    with open(filename, 'r') as data:
-        for line in data:
-            line = line.strip()
-            if ('-' not in line and line != ''):
-                for i_range in ingredient_ids:
-                    if int(line) in range(i_range[0], i_range[1] + 1) and line not in fresh_ingredients:
-                        fresh_ingredients.append(line)
+def merge_ranges(ids):
+    merged = []
+
+    for range in ids:
+        if not merged or merged[-1][1] < range[0]:
+            merged.append(range)
+        else:
+            merged[-1] = (merged[-1][0], max(merged[-1][1], range[1]))
+    return merged
+
+def get_total_ids(merged_ids):
+    ids = 0
+    for range in merged_ids:
+        ids += range[1] - range [0] + 1
+
+    return ids
     
-    return len(fresh_ingredients)
 
 
 
 
 
 def main():
-    ingredient_ids = get_ingredient_id_ranges('puzzle_input.md')
+    ids = get_ingredient_id_ranges('puzzle_input.md')
+
+    merged_ids = merge_ranges(ids)
     
-    fresh_ingredients = count_fresh_ingredients('puzzle_input.md', ingredient_ids)
-    print(f'Fresh ingredients: {fresh_ingredients}')
+    total_ids = get_total_ids(merged_ids)
 
-
+    print(f'Total ids: {total_ids}')
 
 main()
