@@ -26,10 +26,6 @@ def get_total_ids(merged_ids):
         ids += range[1] - range [0] + 1
 
     return ids
-    
-
-
-
 
 
 def main():
