@@ -14,8 +14,10 @@ def merge_ranges(ids):
     merged = []
 
     for range in ids:
+        # om rangen ikke overlapper, altså om merged-lista er tom, eller merged[-1], altså den siste/forrige ranges som ble appendet sin sluttverdi ([-1][1]) er mindre enn startverdien til den neste rangen. Så legges bare rangen til
         if not merged or merged[-1][1] < range[0]:
             merged.append(range)
+        # ellers må de jo overlappe. Da settes den siste rangen i merge-lista som starten til den rangen (som må være minste, siden id-rangene er sortert fra før, slik at vi vet at de før-kommende rangene har lavere start-verdier), så sjekker man hvilken av rangene som har den største sluttverdien.
         else:
             merged[-1] = (merged[-1][0], max(merged[-1][1], range[1]))
     return merged
