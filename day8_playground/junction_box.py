@@ -21,3 +21,6 @@ class JunctionBox:
     
     def set_curcuit(self, curcuit):
         self._curcuit = curcuit
+
+    def get_x(self):
+        return self._coordinates[0]
