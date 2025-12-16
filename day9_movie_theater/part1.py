@@ -17,12 +17,27 @@ def get_dimensions(positions):
             width = position[1]
 
     return [length, width]
+
+def paint_grid(dimensions, positions):
+    for y in range(dimensions[1] + 2):
+        row = []
+        for x in range(dimensions[0] + 3):
+            if [x, y] in positions:
+                row.append('#')
+            else:
+                row.append('.')
+        print(''.join(row))
+
+
     
 def main():
     positions = get_positions('test_input.md')
     print(positions)
+
     dimensions = get_dimensions(positions)
-    print(dimensions[0])
-    print(dimensions[1])
+    print(dimensions)
+
+    paint_grid(dimensions, positions)
+
 
 main()
