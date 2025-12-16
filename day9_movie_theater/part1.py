@@ -18,7 +18,9 @@ def get_dimensions(positions):
 
     return [length, width]
 
-def paint_grid(dimensions, positions):
+def paint_grid(positions):
+    dimensions = get_dimensions(positions)
+    
     for y in range(dimensions[1] + 2):
         row = []
         for x in range(dimensions[0] + 3):
@@ -28,16 +30,26 @@ def paint_grid(dimensions, positions):
                 row.append('.')
         print(''.join(row))
 
+def get_all_areas(positions):
+    areas = {}
+    for pos1 in positions:
+        for pos2 in positions:
+            if pos1 is not pos2:
+                length = (max(pos1[0], pos2[0]) - min(pos1[0], pos2[0]) + 1)
+                width = (max(pos1[1], pos2[1]) - min(pos1[1], pos2[1]) + 1)
+            
+                areas[length * width] = [pos1, pos2]
+    
+    return areas
 
     
 def main():
-    positions = get_positions('test_input.md')
-    print(positions)
+    positions = get_positions('puzzle_input.md')
+    # print(positions)
 
-    dimensions = get_dimensions(positions)
-    print(dimensions)
+    areas = get_all_areas(positions)
+    print(sorted(areas)[-1])
 
-    paint_grid(dimensions, positions)
 
 
 main()
