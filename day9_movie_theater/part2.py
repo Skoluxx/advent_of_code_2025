@@ -8,7 +8,7 @@ def get_red_tiles(filename):
     
     return red_tiles
 
-def get_outer_green_tiles(red_tiles):
+def get_outer_ranges(red_tiles):
     o_green_ranges = []
 
     for idx in range(len(red_tiles) - 1):
@@ -19,8 +19,6 @@ def get_outer_green_tiles(red_tiles):
 
         if x1 == x2:
             x = x1
-            y1 += 1
-            y2 -= 1
 
             if y1 != y2:
                 o_green_ranges.append([[x], [y1, y2]])
@@ -29,8 +27,6 @@ def get_outer_green_tiles(red_tiles):
         
         else:
             y = y1
-            x1 += 1
-            x2 -= 1
 
             if x1 != x2:
                 o_green_ranges.append([[x1, x2], [y]])
@@ -44,8 +40,6 @@ def get_outer_green_tiles(red_tiles):
 
     if x1 == x2:
         x = x1
-        y1 += 1
-        y2 -= 1
 
         if y1 != y2:
             o_green_ranges.append([[x], [y1, y2]])
@@ -54,8 +48,6 @@ def get_outer_green_tiles(red_tiles):
     
     else:
         y = y1
-        x1 += 1
-        x2 -= 1
 
         if x1 != x2:
             o_green_ranges.append([[x1, x2 + 1], [y]])
@@ -74,34 +66,36 @@ def paint_grid(red_tiles, o_green_ranges):
 
     dimensions = [length, width]
 
-    o_green = []
+    o_tiles = []
     for o_range in o_green_ranges:
         if len(o_range[0]) == 1 and len(o_range[1]) == 1:
-            o_green.append([o_range[0][0], o_range[1][0]])
+            o_tiles.append([o_range[0][0], o_range[1][0]])
 
         elif len(o_range[0]) == 1:
             x = o_range[0][0]
 
             for y in range(o_range[1][0], o_range[1][1] + 1):
-                o_green.append([x, y])
+                o_tiles.append([x, y])
         else:
             y = o_range[1][0]
 
             for x in range(o_range[0][0], o_range[0][1] + 1):
-                o_green.append([x, y])
+                o_tiles.append([x, y])
     
     print('Painting grid:')
     for y in range(dimensions[1] + 2):
         row = []
         for x in range(dimensions[0] + 3):
-            if [x, y] in red_tiles:
-                row.append('#')
-            elif [x, y] in o_green:
+            if [x, y] in o_tiles:
                 row.append('X')
             else:
                 row.append('.')
 
         print(''.join(row))
+
+def get_inner_green_ranges(red_tiles, o_green_ranges):
+    for idx in range(len(red_tiles)):
+        pass
 
 def main():
     print('Getting red tiles')
@@ -110,13 +104,13 @@ def main():
     print('len:', len(red_tiles))
     print('Red tiles:', red_tiles, '\n')
 
-    print('Getting outer green tile ranges')
-    o_green_ranges = get_outer_green_tiles(red_tiles)
-    print('Got outer green tile ranges')
-    print('len:', len(o_green_ranges))
-    print('Outer green tile ranges:', o_green_ranges, '\n')
+    print('Getting outer tile ranges')
+    o_ranges = get_outer_ranges(red_tiles)
+    print('Got outer tile ranges')
+    print('len:', len(o_ranges))
+    print('Outer tile ranges:', o_ranges, '\n')
 
-    paint_grid(red_tiles, o_green_ranges)
+    paint_grid(red_tiles, o_ranges)
 
 
 
