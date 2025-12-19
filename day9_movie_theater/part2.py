@@ -1,3 +1,5 @@
+import math
+
 def get_red_tiles(filename):
     red_tiles = []
 
@@ -93,9 +95,48 @@ def paint_grid(red_tiles, o_green_ranges):
 
         print(''.join(row))
 
-def get_inner_green_ranges(red_tiles, o_green_ranges):
-    for idx in range(len(red_tiles)):
-        pass
+def paint_grid2(red_tiles, x_row):
+    length = 0
+    width = 0
+    for position in red_tiles:
+        if position[0] > length:
+            length = position[0]
+        if position[1] > width:
+            width = position[1]
+
+    dimensions = [length, width]
+    print('Painting grid:')
+    for y in range(dimensions[1] + 2):
+        row = []
+        if y in x_row:
+            for x in range(dimensions[0] + 3):
+                if x in range(x_row[y][0], x_row[y][-1] + 1):
+                    
+                    row.append('X')
+                else:
+                    row.append('.')
+
+        print(''.join(row))
+
+def get_row_ranges(o_ranges):
+    row_ranges = {}
+    for o_range in o_ranges:
+        if len(o_range[1]) == 1:
+            if o_range[1][0] not in row_ranges:
+                row_ranges[o_range[1][0]] = set(o_range[0])
+            else:
+                row_ranges[o_range[1][0]].update(set(o_range[0]))
+        else:
+            for y in range(o_range[1][0], o_range[1][-1] + 1):
+                if y not in row_ranges:
+                    row_ranges[y] = set(o_range[0])
+                else:
+                    row_ranges[y].update(set(o_range[0]))
+
+    for value in row_ranges:
+        row_ranges[value] = [min(row_ranges[value]), max(row_ranges[value])]
+    
+    return row_ranges
 
 def main():
     print('Getting red tiles')
@@ -110,7 +151,12 @@ def main():
     print('len:', len(o_ranges))
     print('Outer tile ranges:', o_ranges, '\n')
 
+    row_ranges = get_row_ranges(o_ranges)
+    print(row_ranges)
+    
     paint_grid(red_tiles, o_ranges)
+
+    paint_grid2(red_tiles, row_ranges)
 
 
 
