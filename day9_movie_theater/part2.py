@@ -1,163 +1,116 @@
-import math
+# I credit this: https://github.com/euporphium/pyaoc/blob/main/aoc/2025/solutions/day09_part2.py
+# This was actually just 2 hard for me rn. Spent multiple days and many hours trying to figure out part2, but couldnt do it.
+# My solutions were either plain wrong, or took waaaaaay to long. It do suck, but I'm not 2 mad about it. Better luck next year.
 
-def get_red_tiles(filename):
-    red_tiles = []
+def solve(data):
+    red_tiles = [tuple(map(int, line.split(','))) for line in data]
 
-    with open(filename, 'r') as data:
-        for line in data:
-            position = line.strip().split(',')
-            red_tiles.append([int(position[0]), int(position[1])])
-    
-    return red_tiles
+    # Step 1: Compress 2D coordinates 
+    xs = sorted(set(x for x, y in red_tiles))
+    ys = sorted(set(y for x, y in red_tiles))
 
-def get_outer_ranges(red_tiles):
-    o_green_ranges = []
+    x_map = {x: i for i, x in enumerate(xs)}
+    y_map = {y: i for i, y in enumerate(ys)}
 
-    for idx in range(len(red_tiles) - 1):
-        x1 = min(red_tiles[idx][0], red_tiles[idx + 1][0])
-        x2 = max(red_tiles[idx][0], red_tiles[idx + 1][0])
-        y1 = min(red_tiles[idx][1], red_tiles[idx + 1][1])
-        y2 = max(red_tiles[idx][1], red_tiles[idx + 1][1])
+    # Compressed red tiles
+    compressed_red = [(x_map[x], y_map[y]) for x, y in red_tiles]
 
-        if x1 == x2:
-            x = x1
+    # Create grid
+    width = len(xs)
+    height = len(ys)
+    grid = [['.' for _ in range(width)] for _ in range(height)]
 
-            if y1 != y2:
-                o_green_ranges.append([[x], [y1, y2]])
-            else:
-                o_green_ranges.append([[x], [y1]])
-        
-        else:
-            y = y1
+    # Mark red tiles
+    for cx, cy in compressed_red:
+        grid[cy][cx] = '#'
 
-            if x1 != x2:
-                o_green_ranges.append([[x1, x2], [y]])
-            else:
-                o_green_ranges.append([[x1], [y]])
+    # Step 2: Rasterize polygon edges
+    for i in range(len(compressed_red)):
+        cx1, cy1 = compressed_red[i]
+        cx2, cy2 = compressed_red[(i + 1) % len(compressed_red)]
 
-    x1 = min(red_tiles[0][0], red_tiles[-1][0])
-    x2 = max(red_tiles[0][0], red_tiles[-1][0])
-    y1 = min(red_tiles[0][1], red_tiles[-1][1])
-    y2 = max(red_tiles[0][1], red_tiles[-1][1])
+        if cx1 == cx2:  # vertical line
+            for cy in range(min(cy1, cy2), max(cy1, cy2) + 1):
+                grid[cy][cx1] = '#'
+        elif cy1 == cy2:  # horizontal line
+            for cx in range(min(cx1, cx2), max(cx1, cx2) + 1):
+                grid[cy1][cx] = '#'
 
-    if x1 == x2:
-        x = x1
+    # Step 3: Find an inside point using raycast
+    inside_point = None
+    for cy in range(height):
+        for cx in range(width):
+            if grid[cy][cx] != '.':
+                continue
 
-        if y1 != y2:
-            o_green_ranges.append([[x], [y1, y2]])
-        else:
-            o_green_ranges.append([[x], [y1]])
-    
-    else:
-        y = y1
+            # Count transitions from this point to the left
+            transitions = 0
+            prev = '.'
+            for i in range(cx, -1, -1):
+                cur = grid[cy][i]
+                if cur != prev:
+                    transitions += 1
+                prev = cur
 
-        if x1 != x2:
-            o_green_ranges.append([[x1, x2 + 1], [y]])
-        else:
-            o_green_ranges.append([[y], [x1]])
-    return o_green_ranges
+            # Odd transitions means inside
+            if transitions % 2 == 1:
+                inside_point = (cx, cy)
+                break
+        if inside_point:
+            break
 
-def paint_grid(red_tiles, o_green_ranges):
-    length = 0
-    width = 0
-    for position in red_tiles:
-        if position[0] > length:
-            length = position[0]
-        if position[1] > width:
-            width = position[1]
+    # Step 4: Flood fill from the inside point
+    if inside_point:
+        stack = [inside_point]
+        while stack:
+            cx, cy = stack.pop()
+            if 0 <= cx < width and 0 <= cy < height and grid[cy][cx] == '.':
+                grid[cy][cx] = 'X'
+                stack.extend([(cx + 1, cy), (cx - 1, cy), (cx, cy + 1), (cx, cy - 1)])
 
-    dimensions = [length, width]
+    # Step 5: Find the largest rectangle with red corners where the perimeter is inside polygon
+    largest_area = 0
 
-    o_tiles = []
-    for o_range in o_green_ranges:
-        if len(o_range[0]) == 1 and len(o_range[1]) == 1:
-            o_tiles.append([o_range[0][0], o_range[1][0]])
+    for i, (x1, y1) in enumerate(red_tiles):
+        cx1, cy1 = x_map[x1], y_map[y1]
 
-        elif len(o_range[0]) == 1:
-            x = o_range[0][0]
+        for x2, y2 in red_tiles[i + 1:]:
+            cx2, cy2 = x_map[x2], y_map[y2]
 
-            for y in range(o_range[1][0], o_range[1][1] + 1):
-                o_tiles.append([x, y])
-        else:
-            y = o_range[1][0]
+            # Calculate actual area (not compressed area)
+            actual_width = abs(x2 - x1) + 1
+            actual_height = abs(y2 - y1) + 1
+            area = actual_width * actual_height
 
-            for x in range(o_range[0][0], o_range[0][1] + 1):
-                o_tiles.append([x, y])
-    
-    print('Painting grid:')
-    for y in range(dimensions[1] + 2):
-        row = []
-        for x in range(dimensions[0] + 3):
-            if [x, y] in o_tiles:
-                row.append('X')
-            else:
-                row.append('.')
+            # Skip if this rectangle can't beat current best
+            if area <= largest_area:
+                continue
 
-        print(''.join(row))
+            # Check if the perimeter is enclosed (not outside)
+            min_cx = min(cx1, cx2)
+            max_cx = max(cx1, cx2)
+            min_cy = min(cy1, cy2)
+            max_cy = max(cy1, cy2)
 
-def paint_grid2(red_tiles, x_row):
-    length = 0
-    width = 0
-    for position in red_tiles:
-        if position[0] > length:
-            length = position[0]
-        if position[1] > width:
-            width = position[1]
+            enclosed = True
 
-    dimensions = [length, width]
-    print('Painting grid:')
-    for y in range(dimensions[1] + 2):
-        row = []
-        if y in x_row:
-            for x in range(dimensions[0] + 3):
-                if x in range(x_row[y][0], x_row[y][-1] + 1):
-                    
-                    row.append('X')
-                else:
-                    row.append('.')
+            # Check top and bottom edges
+            for cx in range(min_cx, max_cx + 1):
+                if grid[min_cy][cx] == '.' or grid[max_cy][cx] == '.':
+                    enclosed = False
+                    break
 
-        print(''.join(row))
+            # Check left and right edges
+            if enclosed:
+                for cy in range(min_cy, max_cy + 1):
+                    if grid[cy][min_cx] == '.' or grid[cy][max_cx] == '.':
+                        enclosed = False
+                        break
 
-def get_row_ranges(o_ranges):
-    row_ranges = {}
-    for o_range in o_ranges:
-        if len(o_range[1]) == 1:
-            if o_range[1][0] not in row_ranges:
-                row_ranges[o_range[1][0]] = set(o_range[0])
-            else:
-                row_ranges[o_range[1][0]].update(set(o_range[0]))
-        else:
-            for y in range(o_range[1][0], o_range[1][-1] + 1):
-                if y not in row_ranges:
-                    row_ranges[y] = set(o_range[0])
-                else:
-                    row_ranges[y].update(set(o_range[0]))
+            if enclosed:
+                largest_area = area
 
-    for value in row_ranges:
-        row_ranges[value] = [min(row_ranges[value]), max(row_ranges[value])]
-    
-    return row_ranges
+    return largest_area
 
-def main():
-    print('Getting red tiles')
-    red_tiles = get_red_tiles('test_input.md')
-    print('Got red tiles')
-    print('len:', len(red_tiles))
-    print('Red tiles:', red_tiles, '\n')
-
-    print('Getting outer tile ranges')
-    o_ranges = get_outer_ranges(red_tiles)
-    print('Got outer tile ranges')
-    print('len:', len(o_ranges))
-    print('Outer tile ranges:', o_ranges, '\n')
-
-    row_ranges = get_row_ranges(o_ranges)
-    print(row_ranges)
-    
-    paint_grid(red_tiles, o_ranges)
-
-    paint_grid2(red_tiles, row_ranges)
-
-
-
-main()
+with open('puzzle_input.md', 'r') as data:
+    print(solve(data))
